@@ -1,0 +1,30 @@
+{
+  "name": "gather",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "babel-polyfill": "^6.16.0",
+    "dotenv": "2.0.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "2.6.10",
+    "babel-core": "^6.17.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-latest": "^6.16.0",
+    "serverless-webpack": "1.0.0-rc.2",
+    "webpack": "1.13.2",
+    "webpack-node-externals": "^1.5.4"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SiarheiMelnik/gather.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SiarheiMelnik/gather/issues"
+  },
+  "homepage": "https://github.com/SiarheiMelnik/gather#readme"
+}

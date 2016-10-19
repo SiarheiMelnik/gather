@@ -1,0 +1,27 @@
+
+service: gather-bot
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+
+functions:
+  slack:
+    handler: handler-slack.gather
+    events:
+      - http:
+          path: gather
+          method: post
+#resources:
+#  Resources:
+#    NewResource:
+#      Type: AWS::S3::Bucket
+#      Properties:
+#        BucketName: my-new-bucket
+#  Outputs:
+#     NewOutput:
+#       Description: "Description for the output"
+#       Value: "Some output value"
