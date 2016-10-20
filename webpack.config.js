@@ -7,12 +7,33 @@ const nodeExternals = require('webpack-node-externals');
 module.exports = {
   target: 'node',
   entry: {
-    slack: './src/handlers/slack/handler'
+    slack: [
+      'babel-polyfill',
+      './src/handlers/slack/handler'
+    ]
+  },
+  module: {
+    loaders: [{
+      test: /\.js$/,
+      exclude: /node_modules/,
+      loader: 'babel',
+      query: {
+        cacheDirectory: true,
+        presets: ['es2016-node4'],
+        plugins: [
+          ['transform-runtime', {
+            helpers: false,
+            polyfill: false,
+            regenerator: false,
+          }],
+        ]
+      }
+    }]
   },
   externals: [nodeExternals()],
   output: {
-    libraryTarget: 'commonjs',
+    libraryTarget: 'commonjs2',
     path: path.join(__dirname, '.webpack'),
-    filename: '[name].js'
+    filename: 'handler-[name].js'
   }
 };

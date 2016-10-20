@@ -1,6 +1,6 @@
-'use strict';
 
-module.exports.gather = (event, context, callback) => {
+export const run = (event, context, cb) => {
+  console.log(event);
   const response = {
     statusCode: 200,
     body: JSON.stringify({
@@ -9,5 +9,5 @@ module.exports.gather = (event, context, callback) => {
     }),
   };
 
-  callback(null, response);
+  return cb(null, response);
 };

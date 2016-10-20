@@ -4,13 +4,16 @@ service: gather-bot
 plugins:
   - serverless-webpack
 
+custom:
+  webpackIncludeModules: true
+
 provider:
   name: aws
   runtime: nodejs4.3
 
 functions:
   slack:
-    handler: handler-slack.gather
+    handler: handler-slack.run
     events:
       - http:
           path: gather
