@@ -12,11 +12,17 @@ provider:
   runtime: nodejs4.3
 
 functions:
-  slack:
-    handler: handler-slack.run
+  slackEvents:
+    handler: handler-slack.events
     events:
       - http:
-          path: gather
+          path: events
+          method: post
+  slackCommands:
+    handler: handler-slack.commands
+    events:
+      - http:
+          path: command/{name}
           method: post
 #resources:
 #  Resources:
