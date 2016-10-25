@@ -8,9 +8,13 @@ const webpack = require('webpack');
 module.exports = {
   target: 'node',
   entry: {
-    slack: [
+    'handler-slack': [
       'babel-polyfill',
       './src/handlers/slack/handler'
+    ],
+    'bot-slack': [
+      'babel-polyfill',
+      './src/slackBot/app'
     ]
   },
   module: {
@@ -26,7 +30,7 @@ module.exports = {
             helpers: false,
             polyfill: false,
             regenerator: false,
-          }],
+          }]
         ]
       }
     }]
@@ -36,7 +40,10 @@ module.exports = {
       'process.env': {
         NODE_ENV: JSON.stringify('production'),
         SLACK_TOKEN: JSON.stringify(process.env.SLACK_TOKEN),
-        // SLACK_CLIENT_SECRET: JSON.stringify(process.env.SLACK_CLIENT_SECRET),
+        SLACK_TOKEN_INT: JSON.stringify(process.env.SLACK_TOKEN_INT),
+        SLACK_CLIENT_ID: JSON.stringify(process.env.SLACK_CLIENT_ID),
+        SLACK_CLIENT_SECRET: JSON.stringify(process.env.SLACK_CLIENT_SECRET),
+        SLACK_TOKEN_TEST: JSON.stringify(process.env.SLACK_TOKEN_TEST)
       }
     })
   ],
@@ -44,6 +51,6 @@ module.exports = {
   output: {
     libraryTarget: 'commonjs2',
     path: path.join(__dirname, '.webpack'),
-    filename: 'handler-[name].js'
+    filename: '[name].js'
   }
 };
