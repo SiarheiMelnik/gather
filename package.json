@@ -6,10 +6,10 @@
     "babel-polyfill": "6.16.0",
     "bluebird": "3.4.6",
     "ramda": "0.22.1",
-    "ramda-fantasy": "^0.7.0",
-    "request": "^2.76.0",
+    "ramda-fantasy": "0.7.0",
+    "request": "2.76.0",
     "slack": "7.7.3",
-    "transduce": "^0.10.1",
+    "transduce": "0.10.1",
     "winston": "2.2.0"
   },
   "devDependencies": {

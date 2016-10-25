@@ -85,28 +85,42 @@ module.exports =
 
 	var _fs2 = _interopRequireDefault(_fs);
 
-	var _logger = __webpack_require__(9);
+	var _awsSdk = __webpack_require__(9);
+
+	var _awsSdk2 = _interopRequireDefault(_awsSdk);
+
+	var _logger = __webpack_require__(10);
 
 	var _logger2 = _interopRequireDefault(_logger);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	_awsSdk2.default.config.setPromisesDependency(_bluebird2.default);
+	_awsSdk2.default.config.region = ("us-east-1");
+
 	const token = ("xoxb-95629550994-iTAWep0cPefHB5Rbj1Ysjqnt");
 	const bot = _slack2.default.rtm.client();
+
 	const slackFetcher = _request2.default.defaults({
 	  headers: { Authorization: `Bearer ${ token }` }
 	});
 
-	const slackDeleteFile = _bluebird2.default.promisify(_slack2.default.files.delete);
+	const s3 = new _awsSdk2.default.S3();
 
+	const slackDeleteFile = _bluebird2.default.promisify(_slack2.default.files.delete);
 	const slackFileStream = (_ref) => {
 	  let id = _ref.id;
 	  let name = _ref.name;
 	  let url_private_download = _ref.url_private_download;
-	  return slackFetcher(url_private_download).pipe(_fs2.default.createWriteStream(`./${ name }`)).on('error', _logger2.default.error.bind(_logger2.default)).on('finish', () => {
-	    _logger2.default.info(`File ${ name } downloaded`);
-	    slackDeleteFile({ file: id, token: ("xoxp-93559627205-93553048448-95487762387-461b897d038e4f2a4583152eb3712da5") }).catch(_logger2.default.error.bind(_logger2.default));
-	  });
+
+	  const params = {
+	    Bucket: 'gather-bot-bucket',
+	    Key: `${ id }_${ Date.now() }_${ name }`,
+	    Body: slackFetcher(url_private_download)
+	  };
+
+	  const upload = s3.upload(params);
+	  return Promise.resolve();
 	};
 
 	const getFileInfo = _ramda2.default.pipeP(_bluebird2.default.promisify(_slack2.default.files.info));
@@ -114,8 +128,6 @@ module.exports =
 	const fileHandler = msg => {
 	  const file = _ramda2.default.path(['file', 'id'], msg);
 	  return getFileInfo({ token: token, file: file }).then(d => {
-	    _logger2.default.info(d);
-
 	    var _R$prop = _ramda2.default.prop('file', d);
 
 	    const id = _R$prop.id;
@@ -123,8 +135,10 @@ module.exports =
 	    const mimetype = _R$prop.mimetype;
 	    const url_private_download = _R$prop.url_private_download;
 
+	    _logger2.default.info({ id: id, name: name, mimetype: mimetype, url_private_download: url_private_download });
 	    return slackFileStream({ id: id, name: name, mimetype: mimetype, url_private_download: url_private_download });
-	  });
+	  }).then(() => _logger2.default.info('File on s3')).catch(_logger2.default.error.bind(_logger2.default));
+	  //.finally(slackDeleteFile({ file, token: process.env.SLACK_TOKEN_TEST }));
 	};
 
 	bot.file_shared(fileHandler);
@@ -168,6 +182,12 @@ module.exports =
 
 /***/ },
 /* 9 */
+/***/ function(module, exports) {
+
+	module.exports = require("aws-sdk");
+
+/***/ },
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -176,7 +196,7 @@ module.exports =
 	  value: true
 	});
 
-	var _winston = __webpack_require__(10);
+	var _winston = __webpack_require__(11);
 
 	var _winston2 = _interopRequireDefault(_winston);
 
@@ -191,7 +211,7 @@ module.exports =
 	});
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports) {
 
 	module.exports = require("winston");
