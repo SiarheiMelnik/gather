@@ -44,7 +44,9 @@ module.exports = {
         SLACK_CLIENT_ID: JSON.stringify(process.env.SLACK_CLIENT_ID),
         SLACK_CLIENT_SECRET: JSON.stringify(process.env.SLACK_CLIENT_SECRET),
         SLACK_TOKEN_TEST: JSON.stringify(process.env.SLACK_TOKEN_TEST),
-        AWS_REGION: JSON.stringify(process.env.AWS_REGION)
+        AWS_REGION: JSON.stringify(process.env.AWS_REGION),
+        AWS_KEY: JSON.stringify(process.env.AWS_KEY),
+        AWS_SECRET: JSON.stringify(process.env.AWS_SECRET),
       }
     })
   ],

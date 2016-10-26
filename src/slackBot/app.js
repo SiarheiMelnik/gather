@@ -9,7 +9,6 @@ import AWS from 'aws-sdk';
 import logger from '../shared/logger';
 
 AWS.config.setPromisesDependency(P);
-AWS.config.region = process.env.AWS_REGION;
 
 const token = process.env.SLACK_TOKEN_INT;
 const bot = slack.rtm.client();
@@ -18,17 +17,33 @@ const slackFetcher = request.defaults({
   headers: { Authorization: `Bearer ${token}` }
 });
 
-const s3 = new AWS.S3();
+const s3 = new AWS.S3({
+  region: process.env.AWS_REGION,
+  accessKeyId: process.env.AWS_KEY,
+  secretAccessKey: process.env.AWS_SECRET
+});
 
 const slackDeleteFile = P.promisify(slack.files.delete);
-const slackFileStream = ({ id, name, url_private_download }) => {
+const slackPostMessage = P.promisify(slack.chat.postMessage);
+const slackChannelsList = P.promisify(slack.channels.list);
+
+const slackFileStream = ({ id, name, mimetype, url_private_download }) => {
   const params = {
     Bucket: 'gather-bot-bucket',
-    Key: `${id}_${Date.now()}_${name}`,
-    Body: slackFetcher(url_private_download)
+    Key: `${id}_${Date.now()}_${name}.gz`,
+    ContentType: 'application/x-gzip',
+    ACL: 'public-read',
+    Body: slackFetcher(url_private_download).pipe(zlib.createGzip())
   };
 
-  return s3.putObject(params).promise();
+  const p = new P((resolve, reject) => {
+    s3.upload(params, (err, d) => {
+      if (err) return reject(err);
+      return resolve(d);
+    });
+  });
+
+  return p;
 };
 
 const getFileInfo = R.pipeP(
@@ -36,16 +51,22 @@ const getFileInfo = R.pipeP(
 );
 
 const fileHandler = msg => {
+  logger.info(msg);
   const file = R.path(['file', 'id'], msg);
+  const userId = R.prop('user_id', msg);
   return getFileInfo({ token, file })
     .then((d) => {
       const { id, name, mimetype, url_private_download } = R.prop('file', d);
       logger.info({ id, name, mimetype, url_private_download });
       return slackFileStream({ id, name, mimetype, url_private_download });
     })
-    .then(() => logger.info('File on s3'))
+    .then((d) => {
+      logger.info('File on s3', d);
+      const url = R.prop('Location', d);
+      return slackPostMessage({ token, channel: userId, text: url });
+    })
     .catch(logger.error.bind(logger))
-    //.finally(slackDeleteFile({ file, token: process.env.SLACK_TOKEN_TEST }));
+    .finally(() => slackDeleteFile({ file, token: process.env.SLACK_TOKEN_TEST }));
 };
 
 bot.file_shared(fileHandler);
