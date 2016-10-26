@@ -1,9 +1,11 @@
 
+import logger from '../../shared/logger';
+
 const appToken = process.env.SLACK_TOKEN;
 
 export const events = (event, context, cb) => {
   const body = JSON.parse(event.body);
-  console.log(body);
+  logger.info(body);
   const { token, challenge, type } = body;
 
   if (appToken !== token) return cb(null, { statusCode: 401 });
@@ -14,13 +16,6 @@ export const events = (event, context, cb) => {
         statusCode: 200,
         body: JSON.stringify({ challenge })
       });
-    case 'file_created':
-    case 'file_shared':
-      console.log(body);
-      return cb(null, {
-        statusCode: 200
-      });
-      break;
     default:
       return cb(null, {
         statusCode: 200,
@@ -29,6 +24,11 @@ export const events = (event, context, cb) => {
 };
 
 export const commands = (event, ctx, cb) => {
-  console.log(event);
+  logger.info(event);
   return cb(null, {statusCode: 200, body: JSON.stringify('pong')});
+};
+
+
+export const uploadFile = (event, ctx, cb) => {
+  logger.info(event);
 };

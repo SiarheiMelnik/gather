@@ -24,6 +24,12 @@ functions:
       - http:
           path: command/{name}
           method: post
+  uploadFile:
+    handler: handler-slack.uploadFile
+    events:
+      - s3:
+          bucket: gather-bot-bucket
+          event: s3:ObjectCreated:*
 #resources:
 #  Resources:
 #    NewResource:

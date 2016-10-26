@@ -47,6 +47,7 @@ module.exports = {
         AWS_REGION: JSON.stringify(process.env.AWS_REGION),
         AWS_KEY: JSON.stringify(process.env.AWS_KEY),
         AWS_SECRET: JSON.stringify(process.env.AWS_SECRET),
+        AWS_S3_BUCKET: JSON.stringify(process.env.AWS_S3_BUCKET)
       }
     })
   ],

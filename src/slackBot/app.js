@@ -4,7 +4,6 @@ import P from 'bluebird';
 import R from 'ramda';
 import zlib from 'zlib';
 import request from 'request';
-import fs from 'fs';
 import AWS from 'aws-sdk';
 import logger from '../shared/logger';
 
@@ -29,10 +28,11 @@ const slackChannelsList = P.promisify(slack.channels.list);
 
 const slackFileStream = ({ id, name, mimetype, url_private_download }) => {
   const params = {
-    Bucket: 'gather-bot-bucket',
+    Bucket: process.env.AWS_S3_BUCKET,
     Key: `${id}_${Date.now()}_${name}.gz`,
     ContentType: 'application/x-gzip',
     ACL: 'public-read',
+    Expires: 1,
     Body: slackFetcher(url_private_download).pipe(zlib.createGzip())
   };
 
