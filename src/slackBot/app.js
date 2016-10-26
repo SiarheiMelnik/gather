@@ -63,7 +63,8 @@ const fileHandler = msg => {
     .then((d) => {
       logger.info('File on s3', d);
       const url = R.prop('Location', d);
-      return slackPostMessage({ token, channel: userId, text: url });
+
+      return slackPostMessage({ token, channel: userId, text: url, as_user: true });
     })
     .catch(logger.error.bind(logger))
     .finally(() => slackDeleteFile({ file, token: process.env.SLACK_TOKEN_TEST }));
