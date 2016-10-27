@@ -115,7 +115,7 @@ if (process.env.PROXY_URI) {
   });
 }
 
-app.listen(3000, (err) => {
+app.listen(process.env.PORT, (err) => {
   if (err) throw err;
   bot.listen({ token });
 });
