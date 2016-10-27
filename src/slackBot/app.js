@@ -6,9 +6,12 @@ import zlib from 'zlib';
 import request from 'request';
 import AWS from 'aws-sdk';
 import moment from 'moment';
+import express from 'express';
+import proxy from 'express-http-proxy';
 import { futurizeP } from 'futurize';
 import { Future } from 'ramda-fantasy';
 import logger from '../shared/logger';
+
 
 // AWS.config.setPromisesDependency(P);
 
@@ -103,4 +106,16 @@ const fileHandler = msg => {
 };
 
 bot.file_shared(fileHandler);
-bot.listen({ token });
+
+const app = express();
+
+if (process.env.PROXY_URI) {
+  app.use(proxy(process.env.PROXY_URI), {
+    forwardPath: (req, res) => { return require('url').parse(req.url).path }
+  }));
+}
+
+app.listen(3000, (err) => {
+  if (err) throw err;
+  bot.listen({ token });
+});
