@@ -112,7 +112,7 @@ const app = express();
 if (process.env.PROXY_URI) {
   app.use(proxy(process.env.PROXY_URI), {
     forwardPath: (req, res) => { return require('url').parse(req.url).path }
-  }));
+  });
 }
 
 app.listen(3000, (err) => {
