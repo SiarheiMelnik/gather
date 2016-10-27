@@ -22,16 +22,20 @@
     "babel-preset-es2016-node4": "6.0.1",
     "babel-runtime": "6.11.6",
     "dotenv": "2.0.0",
+    "serverless": "1.0.3",
     "serverless-webpack": "1.0.0-rc.2",
     "webpack": "1.13.2",
     "webpack-node-externals": "1.5.4"
   },
-  "scripts": {},
+  "scripts": {
+    "prestart": "sls webpack",
+    "start": "node .webpack/bot-slack"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SiarheiMelnik/gather.git"
   },
-  "engine": {
+  "engines": {
     "node": "4"
   },
   "author": "",
