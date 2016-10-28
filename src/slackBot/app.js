@@ -7,7 +7,6 @@ import request from 'request';
 import AWS from 'aws-sdk';
 import moment from 'moment';
 import express from 'express';
-import proxy from 'express-http-proxy';
 import { futurizeP } from 'futurize';
 import { Future } from 'ramda-fantasy';
 import logger from '../shared/logger';
@@ -107,15 +106,17 @@ const fileHandler = msg => {
 
 bot.file_shared(fileHandler);
 
-const app = express();
+const PORT = process.env.PORT || 3000;
 
-if (process.env.PROXY_URI) {
-  app.use(proxy(process.env.PROXY_URI), {
-    forwardPath: (req, res) => { return require('url').parse(req.url).path }
-  });
-}
-
-app.listen(process.env.PORT, (err) => {
+const server = express()
+.use((req, res) => res.send('<html></html>'))
+.listen(PORT, (err) => {
   if (err) throw err;
-  bot.listen({ token });
+  logger.info('Express open')
 });
+
+bot.listen({ token }, (err, d) => {
+  logger.info('Bot');
+});
+
+bot.message(logger.info.bind(logger));

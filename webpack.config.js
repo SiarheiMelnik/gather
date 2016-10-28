@@ -30,7 +30,8 @@ module.exports = {
             helpers: false,
             polyfill: false,
             regenerator: false,
-          }]
+          }],
+          'ramda'
         ]
       }
     }]
