@@ -7,6 +7,7 @@ import request from 'request';
 import AWS from 'aws-sdk';
 import moment from 'moment';
 import express from 'express';
+import http from 'http';
 import { futurizeP } from 'futurize';
 import { Future } from 'ramda-fantasy';
 import logger from '../shared/logger';
@@ -106,14 +107,18 @@ const fileHandler = msg => {
 
 bot.file_shared(fileHandler);
 
-const PORT = process.env.PORT || 3000;
+// const server = express()
+// .use((req, res) => res.send('<html></html>'))
+// .listen(PORT, (err) => {
+//   if (err) throw err;
+//   logger.info('Express open')
+// });
 
-const server = express()
-.use((req, res) => res.send('<html></html>'))
-.listen(PORT, (err) => {
-  if (err) throw err;
-  logger.info('Express open')
-});
+
+http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.send('running\n');
+}).listen(process.env.PORT || 5000);
 
 bot.listen({ token }, (err, d) => {
   logger.info('Bot');
