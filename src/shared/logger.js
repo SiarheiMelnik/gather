@@ -1,7 +1,8 @@
 
 import winston from 'winston';
+import moment from 'moment';
 
-const tsFormat = () => (new Date()).toLocaleTimeString();
+const tsFormat = () => moment().format('YY/MM/DD HH:MM:SS');
 
 export default new winston.Logger({
   transports: [
