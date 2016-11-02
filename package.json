@@ -24,14 +24,17 @@
     "babel-preset-es2016-node4": "6.0.1",
     "babel-runtime": "6.11.6",
     "babili-webpack-plugin": "0.0.6",
+    "copy-webpack-plugin": "^4.0.0",
     "dotenv": "2.0.0",
+    "json-loader": "^0.5.4",
     "serverless": "1.0.3",
     "serverless-webpack": "1.0.0-rc.2",
     "webpack": "1.13.2",
+    "webpack-merge": "0.15.0",
     "webpack-node-externals": "1.5.4"
   },
   "scripts": {
-    "start": "sls webpack && node .webpack/bot-slack"
+    "build:bot": "webpack --config webpack.config.js"
   },
   "repository": {
     "type": "git",

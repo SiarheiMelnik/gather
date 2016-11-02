@@ -1,0 +1,8 @@
+{
+  "name": "engine",
+  "description": "Calculate engine",
+  "runtime": "python",
+  "hooks":{
+    "build": "pip install -r requirements.txt -t ."
+  }
+}

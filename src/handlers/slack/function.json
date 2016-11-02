@@ -1,0 +1,8 @@
+{
+  "name": "slackHook",
+  "description": "Slack webhooks and commands handler",
+  "runtime": "nodejs4.3",
+  "hooks":{
+    "build": "webpack --config ./webpack.config"
+  }
+}

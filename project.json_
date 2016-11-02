@@ -1,0 +1,5 @@
+{
+  "name": "gather-bot",
+  "description": "Bot for processing jmeter results",
+  "role": "arn:aws:iam::550997613790:role/gather-bot-dev-IamRoleLambdaExecution-1EBUN1BRL7XRY"
+}

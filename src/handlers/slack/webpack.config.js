@@ -5,14 +5,9 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = merge(config, {
   entry: {
-    'bot-slack': [
+    'handler-slack': [
       'babel-polyfill',
-      './src/slack-bot'
+      './index'
     ]
-  },
-  plugins: [
-    new CopyWebpackPlugin([
-      { from: 'package.json', to: '.build' },
-    ])
-  ]
+  }
 });
