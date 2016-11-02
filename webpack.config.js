@@ -4,6 +4,7 @@ require('dotenv').config();
 const path = require('path');
 const nodeExternals = require('webpack-node-externals');
 const webpack = require('webpack');
+const BabiliPlugin = require("babili-webpack-plugin");
 
 module.exports = {
   target: 'node',
@@ -39,20 +40,33 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify('production'),
-        SLACK_TOKEN: JSON.stringify(process.env.SLACK_TOKEN),
-        SLACK_TOKEN_INT: JSON.stringify(process.env.SLACK_TOKEN_INT),
-        SLACK_CLIENT_ID: JSON.stringify(process.env.SLACK_CLIENT_ID),
-        SLACK_CLIENT_SECRET: JSON.stringify(process.env.SLACK_CLIENT_SECRET),
-        SLACK_TOKEN_TEST: JSON.stringify(process.env.SLACK_TOKEN_TEST),
-        AWS_REGION: JSON.stringify(process.env.AWS_REGION),
-        AWS_KEY: JSON.stringify(process.env.AWS_KEY),
-        AWS_SECRET: JSON.stringify(process.env.AWS_SECRET),
-        AWS_S3_BUCKET: JSON.stringify(process.env.AWS_S3_BUCKET)
+        NODE_ENV: JSON.stringify('production')
       }
-    })
+    }),
+    new webpack.EnvironmentPlugin([
+      'SLACK_TOKEN',
+      'SLACK_TOKEN_INT',
+      'SLACK_CLIENT_ID',
+      'SLACK_CLIENT_SECRET',
+      'SLACK_TOKEN_TEST',
+      'AWS_REGION',
+      'AWS_KEY',
+      'AWS_SECRET',
+      'AWS_S3_BUCKET'
+    ]),
+    new webpack.optimize.DedupePlugin(),
+    // new BabiliPlugin()
   ],
-  externals: [nodeExternals()],
+  externals: [nodeExternals({
+    whitelist: [
+      /^ramda/,
+      'babel-polyfill',
+      'bluebird',
+      'moment',
+      'ramda-fantasy',
+      'futurize'
+    ]
+  })],
   output: {
     libraryTarget: 'commonjs2',
     path: path.join(__dirname, '.webpack'),

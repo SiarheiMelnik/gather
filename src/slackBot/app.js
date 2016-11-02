@@ -6,14 +6,9 @@ import zlib from 'zlib';
 import request from 'request';
 import AWS from 'aws-sdk';
 import moment from 'moment';
-import express from 'express';
-import http from 'http';
 import { futurizeP } from 'futurize';
 import { Future } from 'ramda-fantasy';
 import logger from '../shared/logger';
-
-
-// AWS.config.setPromisesDependency(P);
 
 const futureP = futurizeP(Future);
 
@@ -37,15 +32,14 @@ const slackDeleteFile = P.promisify(slack.files.delete);
 const slackPostMessage = P.promisify(slack.chat.postMessage);
 const slackChannelsList = P.promisify(slack.channels.list);
 const s3PutBucketLifecycleConfiguration = P.promisify(s3.putBucketLifecycleConfiguration);
-const s3Upload = (params) => {
-  return new P((resolve, reject) => {
+const s3Upload = (params) =>
+  new P((resolve, reject) => {
     const upload = s3.upload(params);
     return upload.send((err, res) => {
       if (err) return reject(err);
       return resolve(res);
     });
   });
-};
 
 const log = (d) => {
   logger.info(d);
@@ -72,7 +66,6 @@ const uploadToS3 = R.pipeP(
   R.pipe(R.prop('file'), P.resolve),
   R.pipe(getS3FileParams, P.resolve),
   s3Upload
-  //R.pipe(R.map(s3Upload, s3WaitForFile), P.all)
 );
 
 const postMessage = (channel, text) =>
@@ -96,32 +89,16 @@ const fileHandler = msg => {
     log,
     uploadToS3,
     log,
-    notifyUser(userId),
-    removeFile(file)
+    notifyUser(userId)
   );
 
   return pipeline({ file, token })
-    .catch(logger.error.bind(logger));
-    ///.finally(removeFile(file));
+    .catch(logger.error.bind(logger))
+    .finally(removeFile(file));
 };
 
 bot.file_shared(fileHandler);
 
-// const server = express()
-// .use((req, res) => res.send('<html></html>'))
-// .listen(PORT, (err) => {
-//   if (err) throw err;
-//   logger.info('Express open')
-// });
-
-
-http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.send('running\n');
-}).listen(process.env.PORT || 5000);
-
-bot.listen({ token }, (err, d) => {
-  logger.info('Bot');
-});
+bot.listen({ token }, (err, d) => logger.info('Bot is ready'));
 
 bot.message(logger.info.bind(logger));
