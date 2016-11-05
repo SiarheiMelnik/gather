@@ -1,2 +1,2 @@
 #Gather
-Gather is slack bot for processing csv/xml files from jmeter.
+>Slack bot for processing csv/xml files from [jmeter](http://jmeter.apache.org/).
