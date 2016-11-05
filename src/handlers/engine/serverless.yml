@@ -1,0 +1,15 @@
+
+service: gather-bot-engine
+
+provider:
+  name: aws
+  runtime: python2.7
+  cfLogs: true
+
+functions:
+  engine:
+    handler: handler.engine
+    events:
+      - s3:
+          bucket: gather-bot-bucket
+          event: s3:ObjectCreated:*

@@ -2,3 +2,10 @@ node_modules
 .serverless
 .webpack
 .env
+.build
+*.dist-info
+*.egg-info
+boto
+pandas
+pytz
+numpy

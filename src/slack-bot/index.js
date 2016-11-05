@@ -89,12 +89,13 @@ const fileHandler = msg => {
     log,
     uploadToS3,
     log,
-    notifyUser(userId)
+    notifyUser(userId),
+    log,
+    removeFile(file)
   );
 
   return pipeline({ file, token })
-    .catch(logger.error.bind(logger))
-    .finally(removeFile(file));
+    .catch(logger.error.bind(logger));
 };
 
 bot.file_shared(fileHandler);

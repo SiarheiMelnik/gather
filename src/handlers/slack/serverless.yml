@@ -1,0 +1,27 @@
+
+service: gather-bot-slack
+
+plugins:
+  - serverless-webpack
+
+custom:
+  webpackIncludeModules:
+    packagePath: ../../../package.json
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+
+functions:
+  slackEvents:
+    handler: handler-slack.events
+    events:
+      - http:
+          path: events
+          method: post
+  slackCommands:
+    handler: handler-slack.commands
+    events:
+      - http:
+          path: command/{name}
+          method: post
