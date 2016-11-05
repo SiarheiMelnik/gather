@@ -1,6 +1,7 @@
 
 service: gather-bot-engine
 
+#AWS_CLIENT_TIMEOUT !!
 provider:
   name: aws
   runtime: python2.7
@@ -8,7 +9,7 @@ provider:
 
 functions:
   engine:
-    handler: handler.engine
+    handler: handler.run
     events:
       - s3:
           bucket: gather-bot-bucket
