@@ -1,10 +1,17 @@
 
-require('dotenv').config();
+
 
 const path = require('path');
 const nodeExternals = require('webpack-node-externals');
 const webpack = require('webpack');
 const BabiliPlugin = require("babili-webpack-plugin");
+
+const ROOT = path.normalize(path.join(__dirname, '.'));
+const BUILD = path.join(ROOT, '.build');
+
+require('dotenv').config(
+  { path: path.join(ROOT, '.env') }
+);
 
 module.exports = {
   target: 'node',
@@ -55,11 +62,17 @@ module.exports = {
       'moment',
       'ramda-fantasy',
       'futurize'
-    ]
+    ],
+    modulesDir: path.join(ROOT, 'node_modules')
   })],
   output: {
     libraryTarget: 'commonjs2',
-    path: path.join(__dirname, '.build'),
+    path: BUILD,
     filename: '[name].js'
+  },
+  resolve: {
+    extensions: ['', '.js'], // .json is ommited to ignore ./firebase.json
+    modulesDirectories: ['src', 'node_modules'],
+    root: ROOT
   }
 };

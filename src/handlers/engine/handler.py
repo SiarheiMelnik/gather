@@ -1,9 +1,15 @@
 import logging
 import pandas as pd
 import numpy as np
+import boto3
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+s3 = boto3.client('s3')
+sns = boto3.client('sns')
 
 cols = ['timeStamp', 'elapsed', 'label']
 types = { 'timeStamp': np.int64, 'elapsed': np.int64, 'label': str }
@@ -29,23 +35,35 @@ def process_txn(df):
     txn_df['label'] = txn_df.index.astype(str)
     return txn_df.to_dict('records')
 
-def seq(url):
+def seq(data):
     df = normalize(
-        pd.read_csv(url, usecols=cols, dtype=types, index_col=False)
+        pd.read_csv(data, usecols=cols, dtype=types, index_col=False)
     )
     return process_txn(df)
 
 def run(event, context):
-    s3 = event['Records'][0]['s3']
-    url = 's3://' + s3['bucket']['name'] + '/' + s3['object']['key']
-
     logger.info(pd.__version__)
     logger.info(np.version.version)
-    logger.info(url)
 
-    res = seq(url)
-    # push to SQS for rendering  ?
+    s3_event = event['Records'][0]['s3']
+    logger.info(s3_event)
+
+    obj = s3.get_object(
+        Bucket=s3_event['bucket']['name'],
+        Key=s3_event['object']['key']
+    )
+    res = seq(obj['Body'])
+
     logger.info(res)
+
+    msg = sns.publish(
+        TopicArn: os.environ.get('RENDERER_TOPIC'),
+        Message: res,
+        MessageStructure: 'json'
+    )
+
+    logger.info(msg)
+
     response = {
         "statusCode": 200,
     }

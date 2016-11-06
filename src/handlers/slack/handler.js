@@ -27,3 +27,12 @@ export const commands = (event, ctx, cb) => {
   logger.info(event);
   return cb(null, {statusCode: 200, body: JSON.stringify('pong')});
 };
+
+
+export const renderer = (e, ctx, cb) => {
+  logger.info(e);
+
+  return cb(null, {
+    statusCode: 200
+  });
+}

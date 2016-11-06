@@ -10,3 +10,12 @@ pandas
 pytz
 numpy
 .idea
+boto3
+six.py
+six.pyc
+botocore
+concurrent
+dateutil
+s3transfer
+jmespath
+docutils

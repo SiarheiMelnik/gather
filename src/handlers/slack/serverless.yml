@@ -11,6 +11,7 @@ custom:
 provider:
   name: aws
   runtime: nodejs4.3
+  cfLogs: true
 
 functions:
   slackEvents:
@@ -25,3 +26,9 @@ functions:
       - http:
           path: command/{name}
           method: post
+  reportRenderer:
+    handler: handler-slack.renderer
+    events:
+      - sns:
+          topicName: renderer
+          displayName: Report renderer
