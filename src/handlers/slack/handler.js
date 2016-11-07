@@ -1,6 +1,7 @@
 
 import slack from 'slack';
 import P from 'bluebird';
+import R from 'ramda';
 import logger from '../../shared/logger';
 
 const appToken = process.env.SLACK_TOKEN;
@@ -8,8 +9,8 @@ const intToken = process.env.SLACK_TOKEN_INT;
 
 const slackPostMessage = P.promisify(slack.chat.postMessage);
 
-const postMessage = (channel, text) =>
-  slackPostMessage({ token: intToken, channel, text, as_user: true });
+const postMessage = (channel, text, attachments) =>
+  slackPostMessage({ token: intToken, channel, text, attachments, as_user: true });
 
 
 export const events = (event, context, cb) => {
@@ -42,7 +43,27 @@ export const renderer = (e, ctx, cb) => {
   const { meta: { user }, data } = JSON.parse(e.Records[0].Sns.Message);
   logger.info({ data });
 
-  postMessage(user, data);
+  const txn = data[0].txn;
+  const buildTable = (d) =>
+    R.map(k =>
+      ({ title: k, value: d[k] }),
+      R.keys(d)
+    );
+
+  const fields = R.chain(buildTable, txn);
+
+  const attachments = [
+    {
+      text: 'Transactions',
+      fallback: 'Transactions',
+      fields,
+      color: '#7CD197'
+    }
+  ];
+
+  logger.info(attachments);
+
+  postMessage(user, '', attachments);
 
   return cb(null, {
     statusCode: 200
