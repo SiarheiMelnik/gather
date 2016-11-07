@@ -19,3 +19,5 @@ dateutil
 s3transfer
 jmespath
 docutils
+click
+dotenv

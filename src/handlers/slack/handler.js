@@ -1,7 +1,16 @@
 
+import slack from 'slack';
+import P from 'bluebird';
 import logger from '../../shared/logger';
 
 const appToken = process.env.SLACK_TOKEN;
+const intToken = process.env.SLACK_TOKEN_INT;
+
+const slackPostMessage = P.promisify(slack.chat.postMessage);
+
+const postMessage = (channel, text) =>
+  slackPostMessage({ token: intToken, channel, text, as_user: true });
+
 
 export const events = (event, context, cb) => {
   const body = JSON.parse(event.body);
@@ -30,7 +39,10 @@ export const commands = (event, ctx, cb) => {
 
 
 export const renderer = (e, ctx, cb) => {
-  logger.info(e);
+  const { meta: { user }, data } = JSON.parse(e.Records[0].Sns.Message);
+  logger.info({ data });
+
+  postMessage(user, data);
 
   return cb(null, {
     statusCode: 200

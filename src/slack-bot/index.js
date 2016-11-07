@@ -89,8 +89,6 @@ const fileHandler = msg => {
     log,
     uploadToS3,
     log,
-    notifyUser(userId),
-    log,
     removeFile(file)
   );
 

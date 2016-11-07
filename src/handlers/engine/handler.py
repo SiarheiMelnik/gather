@@ -1,15 +1,27 @@
 import logging
 import pandas as pd
 import numpy as np
-import boto3
+from boto import sns
+from boto.s3.connection import S3Connection
+import json
+import os
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-s3 = boto3.client('s3')
-sns = boto3.client('sns')
+
+sNSConnection = sns.SNSConnection(
+    aws_access_key_id=os.environ['AWS_KEY'],
+    aws_secret_access_key=os.environ['AWS_SECRET'],
+    region=[r for r in sns.regions() if r.name==os.environ['AWS_REGION']][0]
+)
+
+s3Connection = S3Connection(
+    aws_access_key_id=os.environ['AWS_KEY'],
+    aws_secret_access_key=os.environ['AWS_SECRET']
+)
 
 cols = ['timeStamp', 'elapsed', 'label']
 types = { 'timeStamp': np.int64, 'elapsed': np.int64, 'label': str }
@@ -35,9 +47,9 @@ def process_txn(df):
     txn_df['label'] = txn_df.index.astype(str)
     return txn_df.to_dict('records')
 
-def seq(data):
+def seq(url):
     df = normalize(
-        pd.read_csv(data, usecols=cols, dtype=types, index_col=False)
+        pd.read_csv(url, usecols=cols, dtype=types, index_col=False)
     )
     return process_txn(df)
 
@@ -48,21 +60,37 @@ def run(event, context):
     s3_event = event['Records'][0]['s3']
     logger.info(s3_event)
 
-    obj = s3.get_object(
-        Bucket=s3_event['bucket']['name'],
-        Key=s3_event['object']['key']
-    )
-    res = seq(obj['Body'])
+    bucket_name = s3_event['bucket']['name']
+    object_key = s3_event['object']['key']
+
+    bucket = s3Connection.get_bucket(bucket_name)
+    obj = bucket.get_key(object_key)
+
+    url = 's3://' +bucket_name+ '/' + object_key;
+
+    logger.info(url);
+
+    res = seq(url)
 
     logger.info(res)
 
-    msg = sns.publish(
-        TopicArn: os.environ.get('RENDERER_TOPIC'),
-        Message: res,
-        MessageStructure: 'json'
+    msg = {
+        'meta': {
+            'user': obj.get_metadata('user')
+        },
+        'data': [
+            {
+                'txn': res
+            }
+        ]
+    }
+
+    ans = sNSConnection.publish(
+        target_arn=os.environ['RENDERER_TOPIC'],
+        message=json.dumps(msg)
     )
 
-    logger.info(msg)
+    logger.info(ans);
 
     response = {
         "statusCode": 200,
